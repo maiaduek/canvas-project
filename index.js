@@ -23,19 +23,19 @@ class Player {
 }
 
 const duckUp = new Image();
-duckUp.src = "./images/duck-wings-up.jpg";
+duckUp.src = "images/duck-wings-up.jpg"
 
 const duckDown = new Image();
 duckDown.src = "./images/duck-wings-down.jpg";
 
 class Duck {
-  constructor(x) {
-    this.x = 0;
+  constructor(duckPos) {
+    this.x = 100;
     this.y = Math.floor(Math.random * canvas.height - 200);;
     this.w = "30px";
     this.h = "30px";
-    this.duckUp = duckUp;
-    this.duckDown = duckDown;
+    this.duckUp = duckPos;
+    this.duckDown = duckPos;
   }
 
   duckFly() {
@@ -49,19 +49,18 @@ class Duck {
 
 let ducksArr = [];
 
-let newDuck = new Duck();
+let newDuck = new Duck(duckUp);
 
 function createDuck() {
-  ducksArr.push(new Duck())
+  ducksArr.push(new Duck(duckUp))
 }
 
 function startGame() {
   if (!gameOn) {
     gameOn = true;
     setInterval(createDuck, 1500)
-
+    animate();
   }
-  animate();
 }
 
 function detectCollision(duck, obj) {
@@ -82,9 +81,15 @@ function animate() {
   ctx.clearRect(0,0, canvas.width, canvas.height);
 
   ctx.drawImage(newDuck.duckUp, newDuck.x, newDuck.y, newDuck.w, newDuck.h);
-  ctx.drawImage(newDuck.duckDown, newDuck.x, newDuck.y, newDuck.w, newDuck.h);
+  // ctx.drawImage(newDuck.duckDown, newDuck.x, newDuck.y, newDuck.w, newDuck.h);
   for(let i = 0; i < ducksArr.length; i++) {
-    ducksArr[i].fly();
+    ducksArr[i].duckFly();
+    ctx.fillRect(
+      ducksArr[i].x,
+      ducksArr[i].y,
+      ducksArr[i].w,
+      ducksArr[i].h
+    );
   }
   // draw duck 
 }
