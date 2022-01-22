@@ -1,0 +1,25 @@
+#canvas {
+  background-image: url("./images/lake.jpeg");
+  background-size: cover;
+}
+
+#start-game {
+  background-color: red;
+  border-radius: 10px;
+  height:30px;
+  /* float: left; */
+}
+
+.game-intro {
+  color: white;
+  width: 200px;
+  height: auto;
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+}
+
+#score {
+  background-color: green;
+  margin-top: 5px;;
+}
