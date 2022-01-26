@@ -5,16 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link rel="stylesheet" href="./styles.css">
+    <link rel="icon" href="images/duck-icon.png">
     <title>Duck Hunter</title>
+    <style>
+      * {cursor: url(crosshair.cur), default}
+    </style>
   </head>
   <body>
     <div class="game-intro">
       <button id="start-game">Start Game </button>
-      <h2 id="score">SCORE:</h2>
     </div>
-    
+
     <div class="game-board">
-      <canvas id="canvas" width="1000" height="600"></canvas>
+      <canvas id="canvas" width="1000" height="600">
+      </canvas>
     </div>
     <script type="text/javascript" src="./index.js"></script>
   </body>
