@@ -190,8 +190,8 @@ function animate() {
   ctx.restore();
   ctx.fillStyle = "white";
   ctx.font = '25px sans-serif';
-  ctx.fillText(`EARNINGS: ${player.score}`, 100, 35)
-  ctx.fillText(`LEVEL: ${player.level}`, 300, 35)
+  ctx.fillText(`EARNINGS: $${player.score}`, 100, 35)
+  ctx.fillText(`LEVEL: ${player.level}`, 350, 35)
 
   for(let i = 0; i < ducksArr.length; i++) {
     
@@ -246,7 +246,7 @@ function gameOver() {
   ctx.fillText(`GAME OVER`, 375, 100);
   ctx.font = '30px sans-serif';
   ctx.fillStyle = "white";
-  ctx.fillText(`EARNINGS: ${player.score}`, 405, 150)
+  ctx.fillText(`EARNINGS: $${player.score}`, 375, 150)
   ctx.font = '20px sans-serif';
   ctx.fillText(`Tough luck - you missed too many ducks!`, 310, 200);
   sadTrombone.play();
