@@ -29,3 +29,13 @@
 .duck-up {
   position: absolute;
 }
+
+#instructions {
+  border: 1px solid lightblue;
+  background: rgb(50, 194, 50);
+  color: white;
+  border-radius: 5px;
+  width: fit-content;
+  padding: 3px;
+  margin: 0;
+}
