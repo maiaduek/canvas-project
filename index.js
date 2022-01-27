@@ -5,15 +5,30 @@ window.onload = () => {
     setTimeout(startGame, 400)
   } 
 }
+
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+// glabal variables
 let gameOn = false;
+let player;
+let ducksArr = [];
+let size = [70, 100, 130]
+let duckInterval;
+let degree = 0;
+let missedDucks = 0;
+
+let bloodSplat = new Image();
+bloodSplat.src = "images/blood-splat.png";
 
 const hunter = new Image();
 hunter.src = "images/hunter2.png";
 
+const duckUp = new Image();
+duckUp.src = "images/duck-wings-up.png";
 
+const duckDown = new Image();
+duckDown.src = "images/duck-wings-down.png";
 
 class Player {
   constructor() {
@@ -29,14 +44,6 @@ class Player {
     this.level = 1;
   }
 }
-
-let player;
-
-const duckUp = new Image();
-duckUp.src = "images/duck-wings-up.png";
-
-const duckDown = new Image();
-duckDown.src = "images/duck-wings-down.png";
 
 class Duck {
   constructor(size) {
@@ -57,15 +64,12 @@ class Duck {
       this.flyingUp = true;
 
     }
+    // If duck is high up on canvas, flyingUp property gets toggled to false and duck begins to fly down. Speed of duck is determined by the level, adds 2 x-axis points to the level.
     this.x += 2;
     let verticalFlight = this.flyingUp ? -(player.level + 2) : (player.level + 2)
     this.y += verticalFlight;
   }
 }
-
-let ducksArr = [];
-
-let size = [70, 100, 130]
 
 function createDuck() {
   let randSize = Math.floor(Math.random() * size.length);
@@ -77,26 +81,35 @@ function startGame() {
     gameOn = true;
     player = new Player();
     document.getElementById("canvas").style.cursor = 'crosshair';
-    
 
-    setInterval(createDuck,  2000)
+     // Event listener for clicks. Degree of hunter (to rotate) depends on the x axis of the cursor when it was clicked
     window.addEventListener('click', (e) => {
       player.clicked = true;
       player.mouseX = e.x;
       player.mouseY = e.y;
-      if (e.x < 200) {
+
+      if (e.x < 100) {
         degree = 300;
-      } else if (e.x >= 200 && e.x < 400) {
-        degree = 330;
+      } else if (e.x >= 100 && e.x < 200) {
+        degree = 300;
+      } else if (e.x >= 200 && e.x < 300) {
+        degree = 320;
+      } else if (e.x >= 300 && e.x < 400) {
+        degree = 325;
       } else if (e.x >= 400 && e.x < 600) {
+        degree = 335;
+      } else if (e.x >= 600 && e.x < 700) {
+        degree = 340;
+      } else if (e.x >= 700 && e.x < 800) {
         degree = 345;
-      } else if (e.x >= 600 && e.x < 800) {
+      } else if (e.x >= 800 && e.x < 900) {
         degree = 355;
       } else {
-        degree = 5;
+        degree = 10;
       }
     })
 
+    // Toggle duck's flapWingsUp attribute to make the wings flap
     setInterval(() => {
       for (let i = 0; i < ducksArr.length; i++) {
         ducksArr[i].flapWingsUp = !(ducksArr[i].flapWingsUp)
@@ -114,47 +127,63 @@ function detectCollision(duck, obj) {
     duck.y <= obj.mouseY &&
     duck.y + duck.h >= obj.mouseY
   ) {
-    console.log("DUCK HIT")
     return true;
   } else {
     return false;
   }
 }
 
-let degree = 0;
-
 function animate() {
   game = window.requestAnimationFrame(animate);
   ctx.clearRect(0,0, canvas.width, canvas.height);
   ctx.save();
-  ctx.translate(player.x+ 50, player.y + 70);
+  // Change point of origin to make decrease radius of where player rotates.
+  ctx.translate(player.x + 50, player.y + 70);
+  // Degree taken from click event listener
   ctx.rotate(degree * Math.PI / 180);
-  ctx.drawImage(player.img, -50, -20, player.w, player.h);
-  ctx.restore();
 
+  // Constantly choosing random numbers and creating duck when the randomNum = 50
+  let randomNum = Math.floor(Math.random() * 100)
+  if (randomNum === 50) {
+    createDuck();
+  }  
+
+  // Drawing hunter image according to degrees taken from click event listener.
+  if (degree === 300) {
+    ctx.drawImage(player.img, -133, 0, player.w, player.h);
+  } else if (degree === 320) {
+    ctx.drawImage(player.img, -60, -10, player.w, player.h);
+  } else if (degree === 325) {
+    ctx.drawImage(player.img, -50, -20, player.w, player.h);
+  } else if (degree === 335) {
+    ctx.drawImage(player.img, -50, -48, player.w, player.h);
+  } else if (degree === 340) {
+    ctx.drawImage(player.img, -50, -60, player.w, player.h);
+  } else if (degree === 345) {
+    ctx.drawImage(player.img, -50, -70, player.w, player.h);
+  } else if (degree === 355) {
+    ctx.drawImage(player.img, -50, -80, player.w, player.h);
+  } else {
+    ctx.drawImage(player.img, -50, -80, player.w, player.h);
+  }
+
+  ctx.restore();
   ctx.fillStyle = "white";
   ctx.font = '25px sans-serif';
   ctx.fillText(`SCORE: ${player.score}`, 100, 35)
   ctx.fillText(`LEVEL: ${player.level}`, 250, 35)
 
   for(let i = 0; i < ducksArr.length; i++) {
-    if (ducksArr[i].flapWingsUp) {
-      ctx.drawImage(
-        ducksArr[i].duckUp,
+    
+    let pos = ducksArr[i].flapWingsUp ? "duckUp" : "duckDown";
+    // Drawing duck image with wings flapped up or down 
+    ctx.drawImage(
+      ducksArr[i][pos],
         ducksArr[i].x,
         ducksArr[i].y,
         ducksArr[i].w,
         ducksArr[i].h
-      )
-    } else {
-      ctx.drawImage(
-        ducksArr[i].duckDown,
-          ducksArr[i].x,
-          ducksArr[i].y,
-          ducksArr[i].w,
-          ducksArr[i].h
-      )
-    }
+    )
 
     ducksArr[i].duckFly();
 
@@ -162,10 +191,7 @@ function animate() {
       
       let gunshot = new Audio("sounds/gun-shot.mp3");
       gunshot.play();
-      let x = detectCollision(ducksArr[i], player)
-      console.log(x, ducksArr[i], player)
       if (detectCollision(ducksArr[i], player)) {
-        console.log("collided")
         if (ducksArr[i].w === 70) {
           player.score += 5;
         } else if (ducksArr[i].w === 100) {
@@ -173,17 +199,25 @@ function animate() {
         } else {
           player.score += 15;
         }
+        ctx.drawImage(bloodSplat, ducksArr[i].x, ducksArr[i].y, ducksArr[i].w, ducksArr[i].h);
         ducksArr.splice(i, 1);
       }
     }
+
+    if (ducksArr[i].x >= 1050) {
+      ducksArr.splice(i, 1)
+      missedDucks++;
+    }
   }
+
   player.clicked = false;
 
+  // Increse level based on first digit of score once score reaches 3 digits. 
   if (player.score.toString().length >= 3) {
     player.level = parseInt(player.score.toString()[0]) + 1
   }
 
-  if (ducksArr.length === 10) {
+  if (missedDucks === 10) {
     gameOver();
   }
 }
@@ -193,11 +227,17 @@ function gameOver() {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "red";
-  ctx.font = '35px sans-serif'
-  ctx.fillText(`GAME OVER`, 370, 100, 300);
+  ctx.font = '35px sans-serif';
+  ctx.fillText(`GAME OVER`, 375, 100);
+  ctx.font = '30px sans-serif';
   ctx.fillStyle = "white";
-  ctx.font = '20px serif';
+  ctx.fillText(`SCORE: ${player.score}`, 405, 150)
+  ctx.font = '20px sans-serif';
   ctx.fillText(`Tough luck - you missed too many ducks!`, 310, 200);
   let sadTrombone = new Audio("sounds/sad-trombone.mp3");
   sadTrombone.play();
+  gameOn = false;
+  missedDucks = 0;
+  clearInterval(duckInterval);
+  ducksArr = [];
 }
