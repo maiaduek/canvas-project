@@ -1,7 +1,6 @@
 window.onload = () => {
   document.getElementById("start-game").onclick = () => {
-    let gunLoad = new Audio("sounds/gun-load.wav");
-    gunLoad.play();
+    
     setTimeout(startGame, 400)
   } 
 }
@@ -13,10 +12,10 @@ const ctx = canvas.getContext("2d");
 let gameOn = false;
 let player;
 let ducksArr = [];
-let size = [70, 100, 130]
-let duckInterval;
 let degree = 0;
-let missedDucks = 0;
+
+let sadTrombone = new Audio("sounds/sad-trombone.mp3");
+let gunLoad = new Audio("sounds/gun-load.wav");
 
 let bloodSplat = new Image();
 bloodSplat.src = "images/blood-splat.png";
@@ -42,6 +41,7 @@ class Player {
     this.mouseX = 0;
     this.mouseY = 0;
     this.level = 1;
+    this.missedDucks = 0;
   }
 }
 
@@ -69,17 +69,32 @@ class Duck {
     let verticalFlight = this.flyingUp ? -(player.level + 2) : (player.level + 2)
     this.y += verticalFlight;
   }
+
+  drawDuck(pos) {
+    ctx.drawImage(
+      this[pos],
+        this.x,
+        this.y,
+        this.w,
+        this.h
+    )
+  }
+
+  duckBleed() {
+    ctx.drawImage(bloodSplat, this.x, this.y, this.w, this.h);
+  }
 }
 
 function createDuck() {
-  let randSize = Math.floor(Math.random() * size.length);
-  ducksArr.push(new Duck(size[randSize]))
+  let pickRandomSize = Math.floor(Math.random() * 3);
+  ducksArr.push(new Duck([70, 100, 130][pickRandomSize]))
 }
 
 function startGame() {
   if (!gameOn) {
     gameOn = true;
     player = new Player();
+    gunLoad.play();
     document.getElementById("canvas").style.cursor = 'crosshair';
 
      // Event listener for clicks. Degree of hunter (to rotate) depends on the x axis of the cursor when it was clicked
@@ -133,22 +148,8 @@ function detectCollision(duck, obj) {
   }
 }
 
-function animate() {
-  game = window.requestAnimationFrame(animate);
-  ctx.clearRect(0,0, canvas.width, canvas.height);
-  ctx.save();
-  // Change point of origin to decrease radius of where player rotates.
-  ctx.translate(player.x + 50, player.y + 70);
-  // Degree taken from click event listener
-  ctx.rotate(degree * Math.PI / 180);
-
-  // Constantly choosing random numbers and creating duck when the randomNum = 50
-  let randomNum = Math.floor(Math.random() * 100)
-  if (randomNum === 50) {
-    createDuck();
-  }  
-
-  // Drawing hunter image according to degrees taken from click event listener.
+// Choose how to draw hunter image according to degrees taken from click event listener.
+function choosePlayerPos() {
   if (degree === 300) {
     ctx.drawImage(player.img, -133, 0, player.w, player.h);
   } else if (degree === 320) {
@@ -166,6 +167,25 @@ function animate() {
   } else {
     ctx.drawImage(player.img, -50, -80, player.w, player.h);
   }
+}
+
+function animate() {
+  game = window.requestAnimationFrame(animate);
+  ctx.clearRect(0,0, canvas.width, canvas.height);
+  ctx.save();
+  // Change point of origin to decrease radius of where player rotates.
+  ctx.translate(player.x + 50, player.y + 70);
+  // Degree taken from click event listener
+  ctx.rotate(degree * Math.PI / 180);
+
+  // Constantly choosing random numbers and creating duck when the randomNum = 50
+  let randomNum = Math.floor(Math.random() * 100)
+  if (randomNum === 50) {
+    createDuck();
+  }  
+
+  // Drawing player
+  choosePlayerPos();
 
   ctx.restore();
   ctx.fillStyle = "white";
@@ -177,13 +197,8 @@ function animate() {
     
     let pos = ducksArr[i].flapWingsUp ? "duckUp" : "duckDown";
     // Drawing duck image with wings flapped up or down 
-    ctx.drawImage(
-      ducksArr[i][pos],
-        ducksArr[i].x,
-        ducksArr[i].y,
-        ducksArr[i].w,
-        ducksArr[i].h
-    )
+    
+    ducksArr[i].drawDuck(pos);
 
     ducksArr[i].duckFly();
 
@@ -199,14 +214,14 @@ function animate() {
         } else {
           player.score += 15;
         }
-        ctx.drawImage(bloodSplat, ducksArr[i].x, ducksArr[i].y, ducksArr[i].w, ducksArr[i].h);
+        ducksArr[i].duckBleed();
         ducksArr.splice(i, 1);
       }
     }
 
     if (ducksArr[i].x >= 1050) {
       ducksArr.splice(i, 1)
-      missedDucks++;
+      player.missedDucks++;
     }
   }
 
@@ -217,7 +232,7 @@ function animate() {
     player.level = parseInt(player.score.toString()[0]) + 1
   }
 
-  if (missedDucks === 10) {
+  if (player.missedDucks === 10) {
     gameOver();
   }
 }
@@ -234,10 +249,8 @@ function gameOver() {
   ctx.fillText(`SCORE: ${player.score}`, 405, 150)
   ctx.font = '20px sans-serif';
   ctx.fillText(`Tough luck - you missed too many ducks!`, 310, 200);
-  let sadTrombone = new Audio("sounds/sad-trombone.mp3");
   sadTrombone.play();
   gameOn = false;
-  missedDucks = 0;
-  clearInterval(duckInterval);
+  player.missedDucks = 0;
   ducksArr = [];
 }
