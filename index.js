@@ -9,7 +9,7 @@ window.onload = () => {
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// glabal variables
+// Global variables
 let gameOn = false;
 let player;
 let ducksArr = [];
@@ -64,7 +64,7 @@ class Duck {
       this.flyingUp = true;
 
     }
-    // If duck is high up on canvas, flyingUp property gets toggled to false and duck begins to fly down. Speed of duck is determined by the level, adds 2 x-axis points to the level.
+    // If duck is high up on canvas, flyingUp property gets toggled to false and duck begins to fly down and vice versa. Speed of duck is determined by the level, adds 2 x-axis points to the level.
     this.x += 2;
     let verticalFlight = this.flyingUp ? -(player.level + 2) : (player.level + 2)
     this.y += verticalFlight;
@@ -137,7 +137,7 @@ function animate() {
   game = window.requestAnimationFrame(animate);
   ctx.clearRect(0,0, canvas.width, canvas.height);
   ctx.save();
-  // Change point of origin to make decrease radius of where player rotates.
+  // Change point of origin to decrease radius of where player rotates.
   ctx.translate(player.x + 50, player.y + 70);
   // Degree taken from click event listener
   ctx.rotate(degree * Math.PI / 180);
