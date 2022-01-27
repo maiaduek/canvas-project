@@ -191,7 +191,7 @@ function animate() {
   ctx.fillStyle = "white";
   ctx.font = '25px sans-serif';
   ctx.fillText(`EARNINGS: ${player.score}`, 100, 35)
-  ctx.fillText(`LEVEL: ${player.level}`, 250, 35)
+  ctx.fillText(`LEVEL: ${player.level}`, 300, 35)
 
   for(let i = 0; i < ducksArr.length; i++) {
     

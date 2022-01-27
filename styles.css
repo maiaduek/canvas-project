@@ -20,12 +20,6 @@
   flex-direction: row;
 }
 
-#score {
-  color: white;
-  margin-top: 5px;;
-  width: 230px;
-}
-
 .duck-up {
   position: absolute;
 }
