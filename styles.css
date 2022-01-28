@@ -34,3 +34,13 @@
   width: 1000px;
   text-align: center;
 }
+
+#version {
+  order: 1px solid lightblue;
+  background: rgb(50, 194, 50);
+  color: white;
+  border-radius: 5px;
+  padding: 4px;
+  margin: 0;
+  width: fit-content;
+}
